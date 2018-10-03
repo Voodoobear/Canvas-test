@@ -4,9 +4,62 @@
   <meta charset="UTF-8">
   <title>HTML5 Canvas</title>
 </head>
-<body>
+<body style="background-color: #000;">
 <canvas id="draw" width="800" height="800"></canvas>
 <script>
+  const canvas = document.querySelector('#draw'); // Setting the canvas
+  const ctx = canvas.getContext('2d'); // Setting the context
+  canvas.width = window.innerWidth; // Setting the width of the canvas
+  canvas.height = window.innerHeight; // Setting the height of the canvas
+  ctx.strokeStyle = '#ff0000'; // Setting color for the stroke style
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 5;
+  ctx.globalCompositeOperation = 'multiply'; // gives en effect of blend-mix draws
+
+  let isDrawing = false; // By défault, the mousse will have no effect over the canvas
+  let lastX = 0; // Coordinates X and Y initiated
+  let lastY = 0;
+  let hue = 0;
+  let direction = true;
+
+  function draw(e) {
+    if(!isDrawing) return; // Stop the fn from running when they are not moused down
+    console.log(e);
+    ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+    ctx.beginPath(); // Start from
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(e.offsetX, e.offsetY); //Goes to
+    ctx.stroke();
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+    hue++; // increment the color code so it makes drawing like unicorn ranbows!
+    
+    if(hue >= 360) { // make it so if we go larger than 360 (max hls colors) it start again from 0
+      hue=0;
+    }
+
+    if(ctx.lineWidth >= 100 || ctx.lineWidth <= 1) { // make it so that if width is bigger than 100, it decrement insted of incrementing
+    direction = !direction;
+    }
+
+    if(direction) {
+      ctx.lineWidth++;
+    } else {
+      ctx.lineWidth--;
+    }
+
+  } 
+
+  canvas.addEventListener('mousemove', draw); // Event to log the coordinates over the canvas, of the pointer
+  canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+  });
+
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseout', () => isDrawing = false);
+
+
 </script>
 
 <style>
